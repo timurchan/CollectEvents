@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by tiga1115 on 30.01.2017.
  */
 public class FeDataManager implements ConnectionV2.ConnectionListener {
-    private static final int REQUEST_SAVE_SOCIAL_EVENTS = 1;
+    private static final int REQUEST_SAVE_SOCIAL_EVENTS = 10;
 
     public FeDataManager() {
 

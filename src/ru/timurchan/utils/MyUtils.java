@@ -5,9 +5,7 @@ import ru.timurchan.model.Friend;
 import ru.timurchan.vkdata.City;
 
 import java.io.*;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by Timur on 29.01.2017.
@@ -101,6 +99,32 @@ public class MyUtils {
             PrintWriter out = new PrintWriter( fname );
             for (Map.Entry<Integer, City> entry : cities.entrySet()) {
                 String resultJson = gson.toJson(entry.getValue());
+                out.println(resultJson);
+                counter++;
+            }
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(counter + " cities save to " + fname + ". cities.size() = " + cities.size());
+
+        saveCities2(cities);
+    }
+
+    static public void saveCities2(final Map<Integer, City> cities) {
+        Set<City> set = new TreeSet<>();
+
+        for (Map.Entry<Integer, City> entry : cities.entrySet()) {
+            set.add(entry.getValue());
+        }
+
+        String fname = "friends_cities2.txt";
+        int counter = 0;
+        Gson gson = new Gson();
+        try {
+            PrintWriter out = new PrintWriter( fname );
+            for (City city : set) {
+                String resultJson = gson.toJson(city);
                 out.println(resultJson);
                 counter++;
             }

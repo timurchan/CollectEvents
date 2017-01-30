@@ -3,10 +3,11 @@ package ru.timurchan.vkdata;
 /**
  * Created by Timur on 31.01.2017.
  */
-public class City {
-    public int id;
+public class City implements Comparable {
+    public Integer count;
+    public Integer id;
     public String name;
-    public int count;
+
 
     public City(int id, final String name) {
         this.id = id;
@@ -15,4 +16,22 @@ public class City {
     }
 
     public int increment() { return ++count; }
+
+    public boolean equals(Object o) {
+        return (o instanceof City) && (((City)o).id == this.id && ((City)o).count == this.count);
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        City city = (City)o;
+        if(this.count == city.count) {
+            return id.compareTo(city.id);
+        } else {
+            return city.count.compareTo(count);
+        }
+    }
 }

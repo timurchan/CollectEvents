@@ -66,9 +66,6 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
             Friend friend = parseOneFriend(obj);
             mFriends.put(friend.id, friend);
             if(!mCities.containsKey(friend.cityId)) {
-                if(friend.cityId == 0) {
-                    System.out.println(friend.cityId + " | " + friend.cityName);
-                }
                 mCities.put(friend.cityId, new City(friend.cityId, friend.cityName));
             } else {
                 mCities.get(friend.cityId).increment();
