@@ -33,29 +33,53 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
     private int mUserUnavailable = 0;
     private int mQueueCounter = 1;
 
-    Collection<String> mFriendsIds;
-    Map<String, Event> mEvents = new TreeMap<>();
-    ArrayList<Meeting> mMeetings = new ArrayList<>();
+    private int mFriendsCount = 0;
+    private Map<String, Event> mEvents = new TreeMap<>();
+    private ArrayList<Meeting> mMeetings = new ArrayList<>();
 
-    FeDataManager feDataManager = new FeDataManager();
+    private Thread mCollectEventsThread;
 
-    public VkEventsManager() {
+    private FeDataManager feDataManager = new FeDataManager();
 
+    private EventsListener mListener;
+
+    public interface EventsListener {
+        void OnUpdateEventsCount(int count);
+    }
+
+    public VkEventsManager(EventsListener listener) {
+        mListener = listener;
     }
 
     public void collectEvents(final Collection<String> friendsIds) {
+        mCollectEventsThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                collectEventsInternal(friendsIds);
+            }
+        });
+        mCollectEventsThread.start();
+    }
+
+    public void collectEventsInternal(final Collection<String> friendsIds) {
         System.out.println("Total friends: " + friendsIds.size());
+        mFriendsCount = friendsIds.size();
+        mEvents.clear();
         int maxFriends = 1;
-        mFriendsIds = friendsIds;
         Integer percent = 0;
-        for(String id : mFriendsIds) {
+        for(String id : friendsIds) {
+            try {
+                MyUtils.sleepT();
+            } catch (InterruptedException e) {
+                System.out.println("Stop collecting events. Total events: " + mEvents.size());
+                return;
+            }
             getEvent(id);
 //            if(mFriendsProcessedCounter > maxFriends)
 //                break;
-            MyUtils.sleep();
             mFriendsProcessedCounter++;
             Integer oldPercent = percent;
-            percent = 100 * mFriendsProcessedCounter / mFriendsIds.size();
+            percent = 100 * mFriendsProcessedCounter / mFriendsCount;
             if(percent % 2 == 0 && percent != oldPercent) {
                 System.out.println(percent + "% processed");
             }
@@ -178,12 +202,15 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             }
         }
 
+        if(mListener != null)
+            mListener.OnUpdateEventsCount(mEvents.size());
+
         if(counter > 0) {
             System.out.println("parseEvents() for " + userId + " : collected " + counter + " future events. Total Events: " +
                     mEvents.size() + ". Duplicates: " + mCounterAgain + ". PermissionDenied: " + mPermissionDeniedCounter +
                     ". Banned/Deleted: " + mUserUnavailable + ". Empty groupes: " + mEmptyGroupsAnswer +
-                    ". Friends processed: " + mFriendsProcessedCounter + " / " + mFriendsIds.size() +
-                    " (" + mFriendsProcessedCounter/mFriendsIds.size() + ")");
+                    ". Friends processed: " + mFriendsProcessedCounter + " / " + mFriendsCount +
+                    " (" + mFriendsProcessedCounter/mFriendsCount + ")");
 //        System.out.println("-------------------------------------------------------------");
         }
     }
@@ -395,5 +422,11 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             e.printStackTrace();
         }
         return  res;
+    }
+
+    public void stopGettingEvents() {
+        if(mCollectEventsThread != null)
+            mCollectEventsThread.interrupt();
+        mFriendsProcessedCounter = 0;
     }
 }

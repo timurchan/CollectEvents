@@ -19,14 +19,14 @@ Error codes:
 /**
  * Created by Timur on 29.01.2017.
  */
-public class VkDataCollector implements VkFriendsManager.FriendsListener {
+public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEventsManager.EventsListener {
     private static final int ERROR_TOO_MANY_REQUESTS = 6;
     private static final int ERROR_PERMISSION_DENIED = 7;
 
     static private int mPermissionDeniedCounter = 0;
 
     VkFriendsManager mFriendsManager = new VkFriendsManager(this);
-    VkEventsManager mEventsManager = new VkEventsManager();
+    VkEventsManager mEventsManager = new VkEventsManager(this);
 
     GetEvents window;
 
@@ -86,6 +86,10 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener {
         mFriendsManager.stopGettingFriends();
     }
 
+    public void stopGettingEvents() {
+        mEventsManager.stopGettingEvents();
+    }
+
     public void stopAll() {
         stopGettingFriends();
         saveFriends();
@@ -94,5 +98,10 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener {
     @Override
     public void OnUpdateFriendsCount(int count) {
         window.setFriendsCount(count);
+    }
+
+    @Override
+    public void OnUpdateEventsCount(int count) {
+        window.setEventsCount(count);
     }
 }

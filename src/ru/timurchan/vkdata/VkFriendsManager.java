@@ -42,7 +42,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
 
     private boolean getFriends(final String id) {
         System.out.println("Start getFriends() for " + id);
-        if(Thread.currentThread().isInterrupted()) {
+        if (Thread.currentThread().isInterrupted()) {
             System.out.println("[Interruption Thread] bye**");
             return false;
         }
@@ -72,7 +72,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
         for (int i = 0; i < length; i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
             Friend friend = parseOneFriend(obj);
-            if(!mFriends.containsKey(friend.id)) {
+            if (!mFriends.containsKey(friend.id)) {
                 mFriends.put(friend.id, friend);
                 if (!mCities.containsKey(friend.cityId)) {
                     mCities.put(friend.cityId, new City(friend.cityId, friend.cityName));
@@ -81,30 +81,30 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
                 }
             }
         }
-        if(mListener != null)
+        if (mListener != null)
             mListener.OnUpdateFriendsCount(mFriends.size());
     }
 
     private Friend parseOneFriend(final JSONObject obj) throws JSONException {
         Friend user = new Friend();
 
-        if(obj.has("id")) {
+        if (obj.has("id")) {
             user.id = obj.getString("id");
         }
-        if(obj.has("domain")) {
+        if (obj.has("domain")) {
             user.domain = obj.getString("domain");
         }
-        if(obj.has("first_name")) {
+        if (obj.has("first_name")) {
             user.firstName = obj.getString("first_name");
         }
-        if(obj.has("last_name")) {
+        if (obj.has("last_name")) {
             user.lastName = obj.getString("last_name");
         }
 
         String city = "";
-        if(obj.has("city")) {
+        if (obj.has("city")) {
             city = obj.getString("city");
-            if(city != null) {
+            if (city != null) {
                 JSONObject jsonObj = new JSONObject(city);
                 if (jsonObj.has("id")) {
                     user.cityId = jsonObj.getInt("id");
@@ -116,9 +116,9 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
         }
 
         String country = "";
-        if(obj.has("country")) {
+        if (obj.has("country")) {
             country = obj.getString("country");
-            if(country != null) {
+            if (country != null) {
                 JSONObject jsonObj = new JSONObject(country);
                 if (jsonObj.has("id")) {
                     user.countryId = jsonObj.getInt("id");
@@ -139,7 +139,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
         } catch (JSONException e) {
             System.out.println(answer);
             String userId = VkDataCollector.parseErrorResponse(answer);
-            if(userId != null) {
+            if (userId != null) {
                 MyUtils.sleep();
                 getFriends(userId);
             }
@@ -151,21 +151,21 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
         Integer counter = 0;
         Integer percent = 0;
         System.out.println("getFriendsByFriends: " + friendsCount + " friends will be process");
-        for(String friendId : friends) {
-            try {
+        try {
+            for (String friendId : friends) {
                 MyUtils.sleepT();
-            } catch (InterruptedException e) {
-                System.out.println("Stop collectiong friends. Total friends: " + mFriends.size());
-                saveFriendsCities();
-                return;
+                getFriends(friendId);
+                counter++;
+                Integer oldPercent = percent;
+                percent = 100 * counter / friends.size();
+                if (percent % 5 == 0 && percent != oldPercent) {
+                    System.out.println(percent + "% processed");
+                }
             }
-            getFriends(friendId);
-            counter++;
-            Integer oldPercent = percent;
-            percent = 100 * counter / friends.size();
-            if(percent % 5 == 0 && percent != oldPercent) {
-                System.out.println(percent + "% processed");
-            }
+        } catch (InterruptedException e) {
+            System.out.println("Stop collectiong friends. Total friends: " + mFriends.size());
+            saveFriendsCities();
+            return;
         }
         System.out.println("All friends processed");
         saveFriendsCities();
@@ -177,9 +177,8 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
 
 
     public void stopGettingFriends() {
-        if(mGollectFriendsThread != null)
+        if (mGollectFriendsThread != null)
             mGollectFriendsThread.interrupt();
-        mFriendsRequestsCounter = 0;
     }
 
     public void saveFriends() {
@@ -188,6 +187,8 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
 
     public void loadFriends() {
         mFriends = MyUtils.loadFriends();
+        if (mListener != null)
+            mListener.OnUpdateFriendsCount(mFriends.size());
         System.out.println("loadFriends(): mFriends.size() = " + mFriends.size());
     }
 
@@ -196,7 +197,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     public void OnFriendsResponse(String response, final String arg1) {
         parseFriendsResponse(response);
         mFriendsRequestsCounter++;
-        if(mFriendsRequestsCounter == 1) {
+        if (mFriendsRequestsCounter == 1) {
             mGollectFriendsThread = new Thread(new Runnable() {
                 @Override
                 public void run() {

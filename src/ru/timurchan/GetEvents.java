@@ -16,12 +16,14 @@ public class GetEvents {
 
     private JButton buttonGetFriends;
     private JButton buttonStopGettngFriinds;
+    private JLabel labelFriendCount;
 
     private JButton buttonSaveFriends;
     private JButton buttonLoadFriends;
 
     private JButton buttonGetEvents;
-    private JLabel labelFriendCount;
+    private JButton buttonStopGettingEvents;
+    private JLabel labelEventCount;
 
     static private VkDataCollector vkDataCollector = new VkDataCollector();
 
@@ -48,6 +50,7 @@ public class GetEvents {
                 buttonSaveFriends.setEnabled(false);
                 buttonLoadFriends.setEnabled(false);
                 buttonGetEvents.setEnabled(false);
+                buttonStopGettingEvents.setEnabled(false);
             }
         });
         buttonStopGettngFriinds.addActionListener(new ActionListener() {
@@ -59,6 +62,7 @@ public class GetEvents {
                 buttonSaveFriends.setEnabled(true);
                 buttonLoadFriends.setEnabled(true);
                 buttonGetEvents.setEnabled(true);
+                buttonStopGettingEvents.setEnabled(true);
             }
         });
 
@@ -73,6 +77,7 @@ public class GetEvents {
             public void actionPerformed(ActionEvent e) {
                 vkDataCollector.loadFriends();
                 buttonGetEvents.setEnabled(true);
+                buttonStopGettingEvents.setEnabled(true);
             }
         });
 
@@ -83,14 +88,26 @@ public class GetEvents {
                 buttonGetEvents.setEnabled(false);
             }
         });
+        buttonStopGettingEvents.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vkDataCollector.stopGettingEvents();
+            }
+        });
 
         buttonStopGettngFriinds.setEnabled(false);
         buttonSaveFriends.setEnabled(false);
         buttonGetEvents.setEnabled(false);
+        buttonStopGettingEvents.setEnabled(false);
+
     }
 
     public void setFriendsCount(int count) {
         labelFriendCount.setText(String.valueOf(count));
+    }
+
+    public void setEventsCount(int count) {
+        labelEventCount.setText(String.valueOf(count));
     }
 
     static private void addWindowListener(JFrame frame) {
