@@ -15,6 +15,12 @@ public class City implements Comparable {
         count = 1;
     }
 
+    public City(final City city) {
+        this.id = city.id;
+        this.name = city.name;
+        this.count = city.count;
+    }
+
     public int increment() { return ++count; }
 
     public boolean equals(Object o) {

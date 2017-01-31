@@ -98,7 +98,8 @@ public class MyUtils {
         try {
             PrintWriter out = new PrintWriter( fname );
             for (Map.Entry<Integer, City> entry : cities.entrySet()) {
-                String resultJson = gson.toJson(entry.getValue());
+                City city = new City(entry.getValue());
+                String resultJson = gson.toJson(city);
                 out.println(resultJson);
                 counter++;
             }
@@ -115,7 +116,9 @@ public class MyUtils {
         Set<City> set = new TreeSet<>();
 
         for (Map.Entry<Integer, City> entry : cities.entrySet()) {
-            set.add(entry.getValue());
+            City city = new City(entry.getValue());
+            set.add(city);
+            //set.add(entry.getValue());
         }
 
         String fname = "friends_cities2.txt";

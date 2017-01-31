@@ -16,7 +16,8 @@ public class FeUrlProvider {
     }
 
     static private String addSid(final String _url) {
-        String sid = "ec3935cd977b62ec192b7b42fa971859";
+        //String sid = "ec3935cd977b62ec192b7b42fa971859";
+        String sid = "e4248195eb7d4419208e100582b40d0b";
         String url = _url;
         if(url != null && sid != null && !sid.isEmpty()) {
             url += "?sid=";

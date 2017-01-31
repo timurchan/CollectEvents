@@ -64,11 +64,13 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
         for (int i = 0; i < length; i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
             Friend friend = parseOneFriend(obj);
-            mFriends.put(friend.id, friend);
-            if(!mCities.containsKey(friend.cityId)) {
-                mCities.put(friend.cityId, new City(friend.cityId, friend.cityName));
-            } else {
-                mCities.get(friend.cityId).increment();
+            if(!mFriends.containsKey(friend.id)) {
+                mFriends.put(friend.id, friend);
+                if (!mCities.containsKey(friend.cityId)) {
+                    mCities.put(friend.cityId, new City(friend.cityId, friend.cityName));
+                } else {
+                    mCities.get(friend.cityId).increment();
+                }
             }
         }
     }

@@ -48,7 +48,7 @@ public class ImportMeetingCreator {
         SocialMeeting m = new SocialMeeting(type);
 
         m.header = event.name;
-        m.header = "timurellio!!!." + queueNumber + "." + m.header;
+        m.tag = "tim.1." + queueNumber + ".";
         m.message = event.description;
 
         m.setDate(HumanDateConverter.convertDateEpoch(event.start_date, HumanDateConverter.Format.Simple));
@@ -79,7 +79,7 @@ public class ImportMeetingCreator {
             }
         }
 
-        m.membersCounts = event.membersCount;
+        m.membersCount = event.membersCount;
         m.canPost = event.canPost;
         m.socialEventId = event.id;
 
