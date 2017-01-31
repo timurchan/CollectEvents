@@ -16,6 +16,9 @@ public class Meeting  {
         Unknown, Attended, Passed, Invited, Confirmed, Pending, Declined, Owner
     }
 
+    public String startUxTime;
+    public String finishUxTime;
+
     public String header;
     public String photo;        // photo of organizer
     public String message;

@@ -14,13 +14,19 @@ import java.util.*;
  * Created by Timur on 30.01.2017.
  */
 public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener {
-    int mFriendsRequestsCounter = 0;
     Map<String, Friend> mFriends = new TreeMap<>();
     Map<Integer, City> mCities = new TreeMap<>();
 
+    int mFriendsRequestsCounter = 0;
     Thread mGollectFriendsThread;
+    FriendsListener mListener;
 
-    public VkFriendsManager() {
+    public interface FriendsListener {
+        void OnUpdateFriendsCount(int count);
+    }
+
+    public VkFriendsManager(FriendsListener listener) {
+        mListener = listener;
     }
 
     public Collection<String> friendIds() {
@@ -28,6 +34,8 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     }
 
     public void collectFriends() {
+        mFriends.clear();
+        mCities.clear();
         String timurId = "69822";
         getFriends(timurId);            // get 1-st layer of friends of user with id = timurId
     }
@@ -73,6 +81,8 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
                 }
             }
         }
+        if(mListener != null)
+            mListener.OnUpdateFriendsCount(mFriends.size());
     }
 
     private Friend parseOneFriend(final JSONObject obj) throws JSONException {
@@ -167,9 +177,10 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
 
 
     public void stopGettingFriends() {
-        mGollectFriendsThread.interrupt();
+        if(mGollectFriendsThread != null)
+            mGollectFriendsThread.interrupt();
+        mFriendsRequestsCounter = 0;
     }
-
 
     public void saveFriends() {
         MyUtils.saveFriends(mFriends);

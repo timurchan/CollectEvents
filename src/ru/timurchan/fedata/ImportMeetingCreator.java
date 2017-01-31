@@ -51,6 +51,9 @@ public class ImportMeetingCreator {
         m.tag = "tim.1." + queueNumber + ".";
         m.message = event.description;
 
+        m.startUxTime = event.start_date;
+        m.finishUxTime = event.finish_date;
+
         m.setDate(HumanDateConverter.convertDateEpoch(event.start_date, HumanDateConverter.Format.Simple));
         m.setTime(HumanDateConverter.convertTimeEpoch(event.start_date));
 
@@ -82,6 +85,12 @@ public class ImportMeetingCreator {
         m.membersCount = event.membersCount;
         m.canPost = event.canPost;
         m.socialEventId = event.id;
+
+        System.out.println(m.socialEventId + ", " +
+                m.startUxTime + ", " +
+                m.finishUxTime + ", " +
+                m.getDateTime()
+        );
 
         return m;
     }

@@ -2,6 +2,7 @@ package ru.timurchan.vkdata;
 
 
 import org.json.*;
+import ru.timurchan.GetEvents;
 
 
 /*
@@ -18,17 +19,23 @@ Error codes:
 /**
  * Created by Timur on 29.01.2017.
  */
-public class VkDataCollector {
+public class VkDataCollector implements VkFriendsManager.FriendsListener {
     private static final int ERROR_TOO_MANY_REQUESTS = 6;
     private static final int ERROR_PERMISSION_DENIED = 7;
 
     static private int mPermissionDeniedCounter = 0;
 
-    VkFriendsManager mFriendsManager = new VkFriendsManager();
+    VkFriendsManager mFriendsManager = new VkFriendsManager(this);
     VkEventsManager mEventsManager = new VkEventsManager();
+
+    GetEvents window;
 
     public VkDataCollector() {
 
+    }
+
+    public void setWindow(GetEvents window) {
+        this.window = window;
     }
 
     static public String parseErrorResponse(final String answer) {
@@ -77,5 +84,15 @@ public class VkDataCollector {
 
     public void stopGettingFriends() {
         mFriendsManager.stopGettingFriends();
+    }
+
+    public void stopAll() {
+        stopGettingFriends();
+        saveFriends();
+    }
+
+    @Override
+    public void OnUpdateFriendsCount(int count) {
+        window.setFriendsCount(count);
     }
 }
