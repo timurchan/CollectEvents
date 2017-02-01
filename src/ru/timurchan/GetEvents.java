@@ -24,6 +24,8 @@ public class GetEvents {
     private JButton buttonGetEvents;
     private JButton buttonStopGettingEvents;
     private JLabel labelEventCount;
+    private JTextField tfMeetingsPackCount;
+    private JLabel labelFEProcessed;
 
     static private VkDataCollector vkDataCollector = new VkDataCollector();
 
@@ -36,7 +38,7 @@ public class GetEvents {
         frame.pack();
         frame.setVisible(true);
         addWindowListener(frame);
-        frame.setSize(500, 200);
+        frame.setSize(600, 200);
         vkDataCollector.setWindow(getEventInstance);
     }
 
@@ -62,7 +64,7 @@ public class GetEvents {
                 buttonSaveFriends.setEnabled(true);
                 buttonLoadFriends.setEnabled(true);
                 buttonGetEvents.setEnabled(true);
-                buttonStopGettingEvents.setEnabled(true);
+                buttonStopGettingEvents.setEnabled(false);
             }
         });
 
@@ -77,7 +79,8 @@ public class GetEvents {
             public void actionPerformed(ActionEvent e) {
                 vkDataCollector.loadFriends();
                 buttonGetEvents.setEnabled(true);
-                buttonStopGettingEvents.setEnabled(true);
+                buttonStopGettingEvents.setEnabled(false);
+                buttonStopGettngFriinds.setEnabled(false);
             }
         });
 
@@ -85,13 +88,26 @@ public class GetEvents {
             @Override
             public void actionPerformed(ActionEvent e) {
                 vkDataCollector.collectEvents();
+                buttonGetFriends.setEnabled(false);
+                buttonStopGettngFriinds.setEnabled(false);
+                buttonSaveFriends.setEnabled(false);
+                buttonLoadFriends.setEnabled(false);
                 buttonGetEvents.setEnabled(false);
+                buttonStopGettingEvents.setEnabled(true);
+                tfMeetingsPackCount.setEnabled(false);
             }
         });
         buttonStopGettingEvents.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 vkDataCollector.stopGettingEvents();
+                buttonGetFriends.setEnabled(true);
+                buttonStopGettngFriinds.setEnabled(false);
+                buttonSaveFriends.setEnabled(true);
+                buttonLoadFriends.setEnabled(true);
+                buttonGetEvents.setEnabled(true);
+                buttonStopGettingEvents.setEnabled(false);
+                tfMeetingsPackCount.setEnabled(true);
             }
         });
 
@@ -99,15 +115,27 @@ public class GetEvents {
         buttonSaveFriends.setEnabled(false);
         buttonGetEvents.setEnabled(false);
         buttonStopGettingEvents.setEnabled(false);
-
+        tfMeetingsPackCount.setText("10");
+        labelFEProcessed.setText("");
     }
 
     public void setFriendsCount(int count) {
         labelFriendCount.setText(String.valueOf(count));
     }
 
+    public void setFEProcessedCount(int count) {
+        labelFEProcessed.setText(String.valueOf(count));
+    }
+
     public void setEventsCount(int count) {
         labelEventCount.setText(String.valueOf(count));
+        String str = tfMeetingsPackCount.getText();
+        try {
+            Integer packCount = Integer.valueOf(str);
+            vkDataCollector.setMeetingsPackCount(packCount);
+        } catch (NumberFormatException e) {
+            System.out.println("Wrong input value in tfMeetingsPackCount field. String is " + str);
+        }
     }
 
     static private void addWindowListener(JFrame frame) {

@@ -14,12 +14,15 @@ import java.util.*;
  * Created by Timur on 30.01.2017.
  */
 public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener {
-    Map<String, Friend> mFriends = new TreeMap<>();
-    Map<Integer, City> mCities = new TreeMap<>();
+    private Map<String, Friend> mFriends = new TreeMap<>();
+    private Map<Integer, City> mCities = new TreeMap<>();
 
-    int mFriendsRequestsCounter = 0;
-    Thread mGollectFriendsThread;
-    FriendsListener mListener;
+    private int STEP_PERCENT = 5;
+    private int mFriendsRequestsCounter = 0;
+    private Thread mGollectFriendsThread;
+    private FriendsListener mListener;
+
+    private String initialUserrId = "69822";
 
     public interface FriendsListener {
         void OnUpdateFriendsCount(int count);
@@ -36,8 +39,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     public void collectFriends() {
         mFriends.clear();
         mCities.clear();
-        String timurId = "69822";
-        getFriends(timurId);            // get 1-st layer of friends of user with id = timurId
+        getFriends(initialUserrId);            // get 1-st layer of friends of user with id = timurId
     }
 
     private boolean getFriends(final String id) {
@@ -158,7 +160,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
                 counter++;
                 Integer oldPercent = percent;
                 percent = 100 * counter / friends.size();
-                if (percent % 5 == 0 && percent != oldPercent) {
+                if (percent % STEP_PERCENT == 0 && percent != oldPercent) {
                     System.out.println(percent + "% processed");
                 }
             }
@@ -179,6 +181,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     public void stopGettingFriends() {
         if (mGollectFriendsThread != null)
             mGollectFriendsThread.interrupt();
+        mFriendsRequestsCounter = 0;
     }
 
     public void saveFriends() {
@@ -197,7 +200,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     public void OnFriendsResponse(String response, final String arg1) {
         parseFriendsResponse(response);
         mFriendsRequestsCounter++;
-        if (mFriendsRequestsCounter == 1) {
+        if (arg1.equals(initialUserrId)) {
             mGollectFriendsThread = new Thread(new Runnable() {
                 @Override
                 public void run() {

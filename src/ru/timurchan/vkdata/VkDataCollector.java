@@ -92,7 +92,12 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
 
     public void stopAll() {
         stopGettingFriends();
+        stopGettingEvents();
         saveFriends();
+    }
+
+    public void setMeetingsPackCount(int count) {
+        mEventsManager.setMeetingsPackCount(count);
     }
 
     @Override
@@ -103,5 +108,10 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
     @Override
     public void OnUpdateEventsCount(int count) {
         window.setEventsCount(count);
+    }
+
+    @Override
+    public void OnUpdateFEProcessedCount(int count) {
+        window.setFEProcessedCount(count);
     }
 }

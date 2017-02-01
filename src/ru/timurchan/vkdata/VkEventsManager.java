@@ -21,10 +21,10 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
     private static final int ERROR_TOO_MANY_REQUESTS = 6;
     private static final int ERROR_PERMISSION_DENIED = 7;
     private static final int ERROR_USER_WAS_DELETED_OR_BANNED = 18;
-
-    private static final int MEETINGS_COUNT_TO_SEND = 1;
-
     static public final boolean VK_VERSION_USING = false;
+
+    private int MEETINGS_COUNT_TO_SEND = 5;
+    private int STEP_PERCENT = 5;
 
     private int mPermissionDeniedCounter = 0;
     private int mCounterAgain = 0;
@@ -45,10 +45,15 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
 
     public interface EventsListener {
         void OnUpdateEventsCount(int count);
+        void OnUpdateFEProcessedCount(int count);
     }
 
     public VkEventsManager(EventsListener listener) {
         mListener = listener;
+    }
+
+    public void setMeetingsPackCount(int count) {
+        MEETINGS_COUNT_TO_SEND = count;
     }
 
     public void collectEvents(final Collection<String> friendsIds) {
@@ -80,10 +85,15 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             mFriendsProcessedCounter++;
             Integer oldPercent = percent;
             percent = 100 * mFriendsProcessedCounter / mFriendsCount;
-            if(percent % 2 == 0 && percent != oldPercent) {
+            if(percent % STEP_PERCENT == 0 && percent != oldPercent) {
                 System.out.println(percent + "% processed");
             }
+            if (percent % 1 == 0 && percent != oldPercent) {
+                if(mListener != null)
+                    mListener.OnUpdateFEProcessedCount(percent);
+            }
         }
+        sendMeetings();
         System.out.println("All friends processed");
     }
 

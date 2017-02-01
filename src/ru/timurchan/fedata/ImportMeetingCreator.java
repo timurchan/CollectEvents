@@ -48,7 +48,8 @@ public class ImportMeetingCreator {
         SocialMeeting m = new SocialMeeting(type);
 
         m.header = event.name;
-        m.tag = "tim.1." + queueNumber + ".";
+        //m.tag = "tim.1." + queueNumber + ".";
+        m.tag = "tim.";
         m.message = event.description;
 
         m.startUxTime = event.start_date;

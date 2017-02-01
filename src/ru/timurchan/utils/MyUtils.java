@@ -78,7 +78,6 @@ public class MyUtils {
 
 
         //---------------------------------------------------------------------------------------------------
-        counter = 0;
         fname = "friends_id_json.txt";
         try {
             PrintWriter out = new PrintWriter( fname );
@@ -88,18 +87,19 @@ public class MyUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(counter + " friends save to " + fname + ". mFriends.size() = " + friends.size());
+        System.out.println(friends.size() + " friends save to " + fname);
     }
 
     static public void saveCities(final Map<Integer, City> cities) {
+        City[] cityArray = cities.values().toArray(new City[cities.size()]);
+
         String fname = "friends_cities.txt";
         int counter = 0;
         Gson gson = new Gson();
         try {
             PrintWriter out = new PrintWriter( fname );
-            for (Map.Entry<Integer, City> entry : cities.entrySet()) {
-                City city = new City(entry.getValue());
-                String resultJson = gson.toJson(city);
+            for(int i = 0; i < cityArray.length; i++) {
+                String resultJson = gson.toJson(cityArray[i]);
                 out.println(resultJson);
                 counter++;
             }
@@ -109,25 +109,17 @@ public class MyUtils {
         }
         System.out.println(counter + " cities save to " + fname + ". cities.size() = " + cities.size());
 
-        saveCities2(cities);
+        saveCities2(cityArray);
     }
 
-    static public void saveCities2(final Map<Integer, City> cities) {
-        Set<City> set = new TreeSet<>();
-
-        for (Map.Entry<Integer, City> entry : cities.entrySet()) {
-            City city = new City(entry.getValue());
-            set.add(city);
-            //set.add(entry.getValue());
-        }
-
+    static public void saveCities2(City... cityArray) {
         String fname = "friends_cities2.txt";
         int counter = 0;
         Gson gson = new Gson();
         try {
             PrintWriter out = new PrintWriter( fname );
-            for (City city : set) {
-                String resultJson = gson.toJson(city);
+            for(int i = 0; i < cityArray.length; i++) {
+                String resultJson = gson.toJson(cityArray[i]);
                 out.println(resultJson);
                 counter++;
             }
@@ -135,7 +127,7 @@ public class MyUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(counter + " cities save to " + fname + ". cities.size() = " + cities.size());
+        System.out.println(counter + " cities save to " + fname + ". cities.size() = " + cityArray.length);
     }
 
 

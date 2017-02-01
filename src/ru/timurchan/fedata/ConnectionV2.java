@@ -94,7 +94,7 @@ public class ConnectionV2<ClassType> {
         }
 
         mData = res;
-        System.out.println( "onDataLoaded: request = " + requestId + " and Type = " + typeOfT.toString() + " is OK");
+        //System.out.println( "onDataLoaded: request = " + requestId + " and Type = " + typeOfT.toString() + " is OK");
         RequestResult answer = new RequestResult(true, RequestResult.ET_SUCCESS, mUseApiRequest ? res0.resMessage : "");
         return answer;
     }
@@ -170,7 +170,7 @@ public class ConnectionV2<ClassType> {
                 }
             }
 
-            System.out.println( "onDataLoaded: request = " + requestId + " and Type = " + typeOfT.toString() + " is OK");
+            //System.out.println( "onDataLoaded: request = " + requestId + " and Type = " + typeOfT.toString() + " is OK");
             RequestResult answer = new RequestResult(true, RequestResult.ET_SUCCESS, mUseApiRequest ? res0.resMessage : "");
             mListener.onDataLoaded(result, requestId, typeOfT, answer);
         }
