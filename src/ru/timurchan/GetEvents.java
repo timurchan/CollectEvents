@@ -26,6 +26,7 @@ public class GetEvents {
     private JLabel labelEventCount;
     private JTextField tfMeetingsPackCount;
     private JLabel labelFEProcessed;
+    private JTextField tfInitialFriendId;
 
     static private VkDataCollector vkDataCollector = new VkDataCollector();
 
@@ -117,6 +118,7 @@ public class GetEvents {
         buttonStopGettingEvents.setEnabled(false);
         tfMeetingsPackCount.setText("10");
         labelFEProcessed.setText("");
+        tfInitialFriendId.setText("69822");
     }
 
     public void setFriendsCount(int count) {
@@ -133,6 +135,11 @@ public class GetEvents {
         try {
             Integer packCount = Integer.valueOf(str);
             vkDataCollector.setMeetingsPackCount(packCount);
+
+            str = tfInitialFriendId.getText();
+            Integer tmp = Integer.valueOf(str); // initial friend id have to be a number
+
+            vkDataCollector.setInitilFriendId(str);
         } catch (NumberFormatException e) {
             System.out.println("Wrong input value in tfMeetingsPackCount field. String is " + str);
         }

@@ -32,6 +32,10 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
         mListener = listener;
     }
 
+    public void setInitilFriendId(final String initialId) {
+        initialUserrId = initialId;
+    }
+
     public Collection<String> friendIds() {
         return mFriends.keySet();
     }

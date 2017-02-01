@@ -100,6 +100,11 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
         mEventsManager.setMeetingsPackCount(count);
     }
 
+    public void setInitilFriendId(final String initialId) {
+        mFriendsManager.setInitilFriendId(initialId);
+    }
+
+
     @Override
     public void OnUpdateFriendsCount(int count) {
         window.setFriendsCount(count);

@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import ru.timurchan.fedata.FeDataManager;
 import ru.timurchan.fedata.ImportMeetingCreator;
+import ru.timurchan.fedata.Interest;
 import ru.timurchan.fedata.Meeting;
 import ru.timurchan.model.Event;
 import ru.timurchan.model.Friend;
@@ -30,6 +31,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
     private int mCounterAgain = 0;
     private int mEmptyGroupsAnswer = 0;
     private int mFriendsProcessedCounter = 0;
+    private ArrayList<Integer> mFriendsProcessed = new ArrayList<>();
     private int mUserUnavailable = 0;
     private int mQueueCounter = 1;
 
@@ -72,6 +74,8 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
         mEvents.clear();
         int maxFriends = 1;
         Integer percent = 0;
+        if(mListener != null)
+            mListener.OnUpdateFEProcessedCount(0);
         for(String id : friendsIds) {
             try {
                 MyUtils.sleepT();
@@ -223,6 +227,8 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
                     " (" + mFriendsProcessedCounter/mFriendsCount + ")");
 //        System.out.println("-------------------------------------------------------------");
         }
+
+        mFriendsProcessed.add(Integer.valueOf(userId));
     }
 
     public void sendMeetings() {
@@ -438,5 +444,6 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
         if(mCollectEventsThread != null)
             mCollectEventsThread.interrupt();
         mFriendsProcessedCounter = 0;
+        MyUtils.saveProcessedFriends(mFriendsProcessed);
     }
 }

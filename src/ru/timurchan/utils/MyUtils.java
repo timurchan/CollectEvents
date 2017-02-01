@@ -130,6 +130,22 @@ public class MyUtils {
         System.out.println(counter + " cities save to " + fname + ". cities.size() = " + cityArray.length);
     }
 
+    // сохраняет id френдов, для которых уже были просмотрены события
+    static public void saveProcessedFriends(ArrayList<Integer> ids) {
+        Integer[] array = ids.toArray(new Integer[ids.size()]);
+
+        String fname = "friends_processed_ids.txt";
+        Gson gson = new Gson();
+        try {
+            PrintWriter out = new PrintWriter( fname );
+            String resultJson = gson.toJson(array);
+            out.println(resultJson);
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(ids.size() + " processed friends ids save to " + fname);
+    }
 
     static class FastReader
     {
