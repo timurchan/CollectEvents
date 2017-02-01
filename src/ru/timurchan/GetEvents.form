@@ -8,7 +8,7 @@
     <rowspec value="center:max(d;4px):noGrow"/>
     <colspec value="fill:d:grow"/>
     <constraints>
-      <xy x="20" y="24" width="545" height="243"/>
+      <xy x="20" y="24" width="571" height="243"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -152,6 +152,22 @@
             </constraints>
             <properties>
               <text value="Initial friend id"/>
+            </properties>
+          </component>
+          <component id="2d3d9" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="4" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Processed friends, counts"/>
+            </properties>
+          </component>
+          <component id="dd928" class="javax.swing.JLabel" binding="labelFEProcessedCount">
+            <constraints>
+              <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value=""/>
             </properties>
           </component>
         </children>

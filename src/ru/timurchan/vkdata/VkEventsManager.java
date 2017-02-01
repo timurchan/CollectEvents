@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * Created by Timur on 30.01.2017.
  */
-public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  {
+public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
     private static final int ERROR_TOO_MANY_REQUESTS = 6;
     private static final int ERROR_PERMISSION_DENIED = 7;
     private static final int ERROR_USER_WAS_DELETED_OR_BANNED = 18;
@@ -47,7 +47,9 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
 
     public interface EventsListener {
         void OnUpdateEventsCount(int count);
+
         void OnUpdateFEProcessedCount(int count);
+        void OnUpdateFEProcessedFriendsCount(int count);
     }
 
     public VkEventsManager(EventsListener listener) {
@@ -74,9 +76,11 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
         mEvents.clear();
         int maxFriends = 1;
         Integer percent = 0;
-        if(mListener != null)
+        if (mListener != null) {
             mListener.OnUpdateFEProcessedCount(0);
-        for(String id : friendsIds) {
+            mListener.OnUpdateFEProcessedFriendsCount(0);
+        }
+        for (String id : friendsIds) {
             try {
                 MyUtils.sleepT();
             } catch (InterruptedException e) {
@@ -89,12 +93,16 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             mFriendsProcessedCounter++;
             Integer oldPercent = percent;
             percent = 100 * mFriendsProcessedCounter / mFriendsCount;
-            if(percent % STEP_PERCENT == 0 && percent != oldPercent) {
+            if (percent % STEP_PERCENT == 0 && percent != oldPercent) {
                 System.out.println(percent + "% processed");
             }
             if (percent % 1 == 0 && percent != oldPercent) {
-                if(mListener != null)
+                if (mListener != null)
                     mListener.OnUpdateFEProcessedCount(percent);
+            }
+            if (mFriendsProcessedCounter % 10 == 0) {
+                if (mListener != null)
+                    mListener.OnUpdateFEProcessedFriendsCount(mFriendsProcessedCounter);
             }
         }
         sendMeetings();
@@ -108,7 +116,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
     }
 
     private void parseEventsResponse(final String answer, final String userId) {
-        if(answer.equals("{\"response\":[0]}")) {
+        if (answer.equals("{\"response\":[0]}")) {
             mEmptyGroupsAnswer++;
             //System.out.println("parseEventsResponse() : mEmptyGroupsAnswer = " + mEmptyGroupsAnswer);
         } else {
@@ -117,7 +125,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             } catch (JSONException e) {
                 String errUserId = parseErrorResponse(answer);
 
-                if(errUserId == null)
+                if (errUserId == null)
                     System.out.println(answer);
 
                 if (errUserId != null && !errUserId.isEmpty()) {
@@ -135,23 +143,23 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             JSONObject jsonObj = new JSONObject(answer);
             jsonResponse = jsonObj.getJSONObject("error");
             int errorCode = jsonResponse.optInt("error_code");
-            if(errorCode == ERROR_TOO_MANY_REQUESTS) {
+            if (errorCode == ERROR_TOO_MANY_REQUESTS) {
                 JSONArray jsonArray = jsonResponse.getJSONArray("request_params");
                 int length = jsonArray.length();
                 for (int i = 0; i < length; i++) {
-                    if(jsonArray.getJSONObject(i).has("user_id")){
+                    if (jsonArray.getJSONObject(i).has("user_id")) {
                         return jsonArray.getJSONObject(i).getString("user_id");
                     }
                     JSONObject obj = new JSONObject(jsonArray.optString(i));
-                    if(obj.has("user_id")) {
+                    if (obj.has("user_id")) {
                         return obj.optString("user_id");
                     }
                     return "";
                 }
-            } else if(errorCode == ERROR_PERMISSION_DENIED) {
+            } else if (errorCode == ERROR_PERMISSION_DENIED) {
                 mPermissionDeniedCounter++;
                 return "";
-            } else if(errorCode == ERROR_USER_WAS_DELETED_OR_BANNED) {
+            } else if (errorCode == ERROR_USER_WAS_DELETED_OR_BANNED) {
                 mUserUnavailable++;
                 return "";
             }
@@ -165,7 +173,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
 
     private void parseEvents(final String answer, final String userId) throws JSONException {
         JSONObject jsonObj;
-        if(!VK_VERSION_USING) {
+        if (!VK_VERSION_USING) {
             String correctAnswer = correctAnswer(answer);
             jsonObj = new JSONObject(correctAnswer);
         } else {
@@ -180,10 +188,10 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
 
         for (int i = 0; i < length; i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
-            if(obj.has("type")) {
+            if (obj.has("type")) {
                 if (obj.getString("type").equals("event")) {
                     Event event = null;
-                    if(VK_VERSION_USING) {
+                    if (VK_VERSION_USING) {
                         event = parseOneEvent(obj);
                     } else {
                         event = parseOneEventWithoutVersion(obj);
@@ -199,7 +207,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
                     if (curStartTime > unixTime) {
                         counter++;
                         String eventId = Integer.toString(event.id);
-                        if(!mEvents.containsKey(eventId)) {
+                        if (!mEvents.containsKey(eventId)) {
                             System.out.println(" - FE - " + event.name);
                             mEvents.put(eventId, event);
                             mMeetings.add(ImportMeetingCreator.createMeeting(event, mQueueCounter));
@@ -207,7 +215,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
                             mCounterAgain++;
                         }
 
-                        if(mMeetings.size() >= MEETINGS_COUNT_TO_SEND) {
+                        if (mMeetings.size() >= MEETINGS_COUNT_TO_SEND) {
                             sendMeetings();
                             mQueueCounter++;
                         }
@@ -216,15 +224,15 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             }
         }
 
-        if(mListener != null)
+        if (mListener != null)
             mListener.OnUpdateEventsCount(mEvents.size());
 
-        if(counter > 0) {
+        if (counter > 0) {
             System.out.println("parseEvents() for " + userId + " : collected " + counter + " future events. Total Events: " +
                     mEvents.size() + ". Duplicates: " + mCounterAgain + ". PermissionDenied: " + mPermissionDeniedCounter +
                     ". Banned/Deleted: " + mUserUnavailable + ". Empty groupes: " + mEmptyGroupsAnswer +
                     ". Friends processed: " + mFriendsProcessedCounter + " / " + mFriendsCount +
-                    " (" + mFriendsProcessedCounter/mFriendsCount + ")");
+                    " (" + mFriendsProcessedCounter / mFriendsCount + ")");
 //        System.out.println("-------------------------------------------------------------");
         }
 
@@ -272,13 +280,13 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
 
     private Event parseOneEventWithoutVersion(JSONObject jsonResponse) throws JSONException {
         Event event = new Event();
-        if(jsonResponse.has("gid")) {
+        if (jsonResponse.has("gid")) {
             event.id = jsonResponse.getInt("gid");
         }
-        if(jsonResponse.has("name")) {
+        if (jsonResponse.has("name")) {
             event.name = jsonResponse.getString("name");
         }
-        if(jsonResponse.has("photo_big")) {
+        if (jsonResponse.has("photo_big")) {
             event.photo = jsonResponse.getString("photo_big");
         }
 
@@ -290,14 +298,14 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
         if (jsonResponse.has("finish_date")) {
             event.finish_date = jsonResponse.getString("finish_date");
         }
-        if(jsonResponse.has("description")) {
+        if (jsonResponse.has("description")) {
             event.description = jsonResponse.getString("description");
         }
 
         String place = "";
-        if(jsonResponse.has("place")) {
+        if (jsonResponse.has("place")) {
             place = jsonResponse.getString("place");
-            if(place != null) {
+            if (place != null) {
                 JSONObject jsonObj = new JSONObject(place);
                 if (jsonObj.has("title")) {
                     event.placeTitle = jsonObj.getString("title");
@@ -334,10 +342,10 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             }
         }
 
-        if(jsonResponse.has("members_count")) {
+        if (jsonResponse.has("members_count")) {
             event.membersCount = jsonResponse.getInt("members_count");
         }
-        if(jsonResponse.has("can_post")) {
+        if (jsonResponse.has("can_post")) {
             event.canPost = jsonResponse.getInt("can_post");
         }
 
@@ -346,13 +354,13 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
 
     private Event parseOneEvent(JSONObject jsonResponse) throws JSONException {
         Event event = new Event();
-        if(jsonResponse.has("id")) {
+        if (jsonResponse.has("id")) {
             event.id = jsonResponse.getInt("id");
         }
-        if(jsonResponse.has("name")) {
+        if (jsonResponse.has("name")) {
             event.name = jsonResponse.getString("name");
         }
-        if(jsonResponse.has("photo_200")) {
+        if (jsonResponse.has("photo_200")) {
             event.photo = jsonResponse.getString("photo_200");
         }
 
@@ -364,14 +372,14 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
         if (jsonResponse.has("finish_date")) {
             event.finish_date = jsonResponse.getString("finish_date");
         }
-        if(jsonResponse.has("description")) {
+        if (jsonResponse.has("description")) {
             event.description = jsonResponse.getString("description");
         }
 
         String city = "";
-        if(jsonResponse.has("city")) {
+        if (jsonResponse.has("city")) {
             city = jsonResponse.getString("city");
-            if(city != null) {
+            if (city != null) {
                 JSONObject jsonObj = new JSONObject(city);
                 if (jsonObj.has("id")) {
                     event.socialCityId = jsonObj.getInt("id");
@@ -382,9 +390,9 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             }
         }
         String place = "";
-        if(jsonResponse.has("place")) {
+        if (jsonResponse.has("place")) {
             place = jsonResponse.getString("place");
-            if(place != null) {
+            if (place != null) {
                 JSONObject jsonObj = new JSONObject(place);
                 if (jsonObj.has("title")) {
                     event.placeTitle = jsonObj.getString("title");
@@ -418,10 +426,10 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
             }
         }
 
-        if(jsonResponse.has("members_count")) {
+        if (jsonResponse.has("members_count")) {
             event.membersCount = jsonResponse.getInt("members_count");
         }
-        if(jsonResponse.has("can_post")) {
+        if (jsonResponse.has("can_post")) {
             event.canPost = jsonResponse.getInt("can_post");
         }
 
@@ -437,11 +445,11 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener  
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        return  res;
+        return res;
     }
 
     public void stopGettingEvents() {
-        if(mCollectEventsThread != null)
+        if (mCollectEventsThread != null)
             mCollectEventsThread.interrupt();
         mFriendsProcessedCounter = 0;
         MyUtils.saveProcessedFriends(mFriendsProcessed);

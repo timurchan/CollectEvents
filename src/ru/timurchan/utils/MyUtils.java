@@ -44,23 +44,9 @@ public class MyUtils {
         return  null;
     }
 
-
     static public void saveFriends(final Map<String, Friend> friends) {
         String fname = "friends.txt";
         int counter = 0;
-//        try {
-//            PrintWriter out = new PrintWriter( fname );
-//            for (Map.Entry<String, Friend> entry : friends.entrySet()) {
-//                out.println(entry.getValue().toString());
-//                counter++;
-//            }
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(counter + " friends save to " + fname + ". mFriends.size() = " + friends.size());
-
-        //---------------------------------------------------------------------------------------------------
-        counter = 0;
         Gson gson = new Gson();
         fname = "friends_json.txt";
         try {

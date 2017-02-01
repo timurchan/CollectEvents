@@ -119,4 +119,9 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
     public void OnUpdateFEProcessedCount(int count) {
         window.setFEProcessedCount(count);
     }
+
+    @Override
+    public void OnUpdateFEProcessedFriendsCount(int count) {
+        window.setFEProcessedFriendsCount(count);
+    }
 }

@@ -27,6 +27,7 @@ public class GetEvents {
     private JTextField tfMeetingsPackCount;
     private JLabel labelFEProcessed;
     private JTextField tfInitialFriendId;
+    private JLabel labelFEProcessedCount;
 
     static private VkDataCollector vkDataCollector = new VkDataCollector();
 
@@ -39,7 +40,7 @@ public class GetEvents {
         frame.pack();
         frame.setVisible(true);
         addWindowListener(frame);
-        frame.setSize(600, 200);
+        frame.setSize(650, 300);
         vkDataCollector.setWindow(getEventInstance);
     }
 
@@ -128,6 +129,11 @@ public class GetEvents {
     public void setFEProcessedCount(int count) {
         labelFEProcessed.setText(String.valueOf(count));
     }
+
+    public void setFEProcessedFriendsCount(int count) {
+        labelFEProcessedCount.setText(String.valueOf(count));
+    }
+
 
     public void setEventsCount(int count) {
         labelEventCount.setText(String.valueOf(count));
