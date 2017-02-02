@@ -28,6 +28,8 @@ public class GetEvents {
     private JLabel labelFEProcessed;
     private JTextField tfInitialFriendId;
     private JLabel labelFEProcessedCount;
+    private JButton buttonLoadProcessedFriends;
+    private JLabel labelPreviousProcessedFriends;
 
     static private VkDataCollector vkDataCollector = new VkDataCollector();
 
@@ -120,6 +122,12 @@ public class GetEvents {
         tfMeetingsPackCount.setText("10");
         labelFEProcessed.setText("");
         tfInitialFriendId.setText("69822");
+        buttonLoadProcessedFriends.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vkDataCollector.loadProcessedFriends();
+            }
+        });
     }
 
     public void setFriendsCount(int count) {
@@ -134,6 +142,9 @@ public class GetEvents {
         labelFEProcessedCount.setText(String.valueOf(count));
     }
 
+    public void setPreviousProcessedFriendsCount(int count) {
+        labelPreviousProcessedFriends.setText(String.valueOf(count));
+    }
 
     public void setEventsCount(int count) {
         labelEventCount.setText(String.valueOf(count));

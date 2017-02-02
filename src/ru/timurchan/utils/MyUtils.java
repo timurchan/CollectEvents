@@ -11,7 +11,14 @@ import java.util.*;
  * Created by Timur on 29.01.2017.
  */
 public class MyUtils {
-    static final int deltaTime = 370; // msec
+    private static final int deltaTime = 370; // msec
+
+    private static final String FRIENDS_PROCESSED_IDS_FNAME = "friends_processed_ids.txt";
+    private static final String FRIENDS_FNAME = "friends.txt";
+    private static final String FRIENDS_IDS_FNAME = "friends_ids.txt";
+    private static final String FRIENDS_CITIES_FNAME = "friends_cities.txt";
+    private static final String FRIENDS_CITIES_ORDERED_FNAME = "friends_cities_ordered.txt";
+
 
     static public void sleep() {
         try {
@@ -30,27 +37,25 @@ public class MyUtils {
         FastReader reader = new FastReader();
         Gson gson = new Gson();
         try {
-            while(true) {
+            while (true) {
                 String json_string = reader.nextLine();
-                if(json_string == null || json_string.isEmpty())
+                if (json_string == null || json_string.isEmpty())
                     break;
                 Friend friend = gson.fromJson(json_string, Friend.class);
                 res.put(friend.id, friend);
             }
             return res;
-        } catch (Exception e) {
+        } catch (Exception e) { 
             e.printStackTrace();
         }
-        return  null;
+        return null;
     }
 
     static public void saveFriends(final Map<String, Friend> friends) {
-        String fname = "friends.txt";
         int counter = 0;
         Gson gson = new Gson();
-        fname = "friends_json.txt";
         try {
-            PrintWriter out = new PrintWriter( fname );
+            PrintWriter out = new PrintWriter(FRIENDS_FNAME);
             for (Map.Entry<String, Friend> entry : friends.entrySet()) {
                 String resultJson = gson.toJson(entry.getValue());
                 out.println(resultJson);
@@ -60,31 +65,32 @@ public class MyUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(counter + " friends save to " + fname + ". mFriends.size() = " + friends.size());
+        System.out.println(counter + " friends saved to " + FRIENDS_FNAME + ". mFriends.size() = " + friends.size());
 
+        saveFriendsIds(friends);
+    }
 
-        //---------------------------------------------------------------------------------------------------
-        fname = "friends_id_json.txt";
+    static public void saveFriendsIds(final Map<String, Friend> friends) {
+        Gson gson = new Gson();
         try {
-            PrintWriter out = new PrintWriter( fname );
+            PrintWriter out = new PrintWriter(FRIENDS_IDS_FNAME);
             String resultJson = gson.toJson(friends.keySet());
             out.println(resultJson);
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(friends.size() + " friends save to " + fname);
+        System.out.println(friends.size() + " friends saved to " + FRIENDS_IDS_FNAME);
     }
 
     static public void saveCities(final Map<Integer, City> cities) {
         City[] cityArray = cities.values().toArray(new City[cities.size()]);
 
-        String fname = "friends_cities.txt";
         int counter = 0;
         Gson gson = new Gson();
         try {
-            PrintWriter out = new PrintWriter( fname );
-            for(int i = 0; i < cityArray.length; i++) {
+            PrintWriter out = new PrintWriter(FRIENDS_CITIES_FNAME);
+            for (int i = 0; i < cityArray.length; i++) {
                 String resultJson = gson.toJson(cityArray[i]);
                 out.println(resultJson);
                 counter++;
@@ -93,18 +99,15 @@ public class MyUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(counter + " cities save to " + fname + ". cities.size() = " + cities.size());
-
-        saveCities2(cityArray);
+        System.out.println(counter + " cities save to " + FRIENDS_CITIES_FNAME + ". cities.size() = " + cities.size());
     }
 
-    static public void saveCities2(City... cityArray) {
-        String fname = "friends_cities2.txt";
+    static public void saveCitiesOrdered(City... cityArray) {
         int counter = 0;
         Gson gson = new Gson();
         try {
-            PrintWriter out = new PrintWriter( fname );
-            for(int i = 0; i < cityArray.length; i++) {
+            PrintWriter out = new PrintWriter(FRIENDS_CITIES_ORDERED_FNAME);
+            for (int i = 0; i < cityArray.length; i++) {
                 String resultJson = gson.toJson(cityArray[i]);
                 out.println(resultJson);
                 counter++;
@@ -113,36 +116,71 @@ public class MyUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(counter + " cities save to " + fname + ". cities.size() = " + cityArray.length);
+        System.out.println(counter + " cities save to " + FRIENDS_CITIES_ORDERED_FNAME + ". cities.size() = " + cityArray.length);
+    }
+
+    static public void saveCitiesOrdered(final Map<Integer, City> cities) {
+        Set<City> set = new TreeSet<>();
+
+        for (Map.Entry<Integer, City> entry : cities.entrySet()) {
+            set.add(entry.getValue());
+        }
+
+        int counter = 0;
+        Gson gson = new Gson();
+        try {
+            PrintWriter out = new PrintWriter(FRIENDS_CITIES_ORDERED_FNAME);
+            for (City city : set) {
+                String resultJson = gson.toJson(city);
+                out.println(resultJson);
+                counter++;
+            }
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(counter + " cities saved to " + FRIENDS_CITIES_ORDERED_FNAME + ". cities.size() = " + cities.size());
+    }
+
+    static public Set<Integer> loadProcessedFriends() {
+        Set<Integer> res = new HashSet<>();
+        Gson gson = new Gson();
+
+        try {
+            Integer[] ids = gson.fromJson(new FileReader(FRIENDS_PROCESSED_IDS_FNAME), Integer[].class);
+            res = new HashSet<>(Arrays.asList(ids));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(res.size() + " friends ids loaded from " + FRIENDS_PROCESSED_IDS_FNAME);
+        return res;
     }
 
     // сохраняет id френдов, для которых уже были просмотрены события
     static public void saveProcessedFriends(ArrayList<Integer> ids) {
         Integer[] array = ids.toArray(new Integer[ids.size()]);
 
-        String fname = "friends_processed_ids.txt";
         Gson gson = new Gson();
         try {
-            PrintWriter out = new PrintWriter( fname );
+            PrintWriter out = new PrintWriter(FRIENDS_PROCESSED_IDS_FNAME);
             String resultJson = gson.toJson(array);
             out.println(resultJson);
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(ids.size() + " processed friends ids save to " + fname);
+        System.out.println(ids.size() + " friends ids saved to " + FRIENDS_PROCESSED_IDS_FNAME);
     }
 
-    static class FastReader
-    {
+    static class FastReader {
         FileInputStream fis;
         BufferedReader br;
         StringTokenizer st;
 
-        public FastReader()
-        {
+        public FastReader() {
             try {
-                fis = new FileInputStream("friends_json.txt");
+                fis = new FileInputStream(FRIENDS_FNAME);
                 br = new BufferedReader(new InputStreamReader(fis));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -150,9 +188,8 @@ public class MyUtils {
             //br = new BufferedReader(new InputStreamReader(System.in));
         }
 
-        String nextLine()
-        {
-            if(br != null) {
+        String nextLine() {
+            if (br != null) {
                 String str = "";
                 try {
                     str = br.readLine();

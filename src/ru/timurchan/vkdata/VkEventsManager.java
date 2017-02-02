@@ -5,10 +5,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import ru.timurchan.fedata.FeDataManager;
 import ru.timurchan.fedata.ImportMeetingCreator;
-import ru.timurchan.fedata.Interest;
 import ru.timurchan.fedata.Meeting;
 import ru.timurchan.model.Event;
-import ru.timurchan.model.Friend;
 import ru.timurchan.utils.MyHttpURLConnection;
 import ru.timurchan.utils.MyUtils;
 import ru.timurchan.utils.VkUrlProvider;
@@ -30,7 +28,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
     private int mPermissionDeniedCounter = 0;
     private int mCounterAgain = 0;
     private int mEmptyGroupsAnswer = 0;
-    private int mFriendsProcessedCounter = 0;
+    private int mFriendsAnalysedCounter = 0;
     private ArrayList<Integer> mFriendsProcessed = new ArrayList<>();
     private int mUserUnavailable = 0;
     private int mQueueCounter = 1;
@@ -45,15 +43,25 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
 
     private EventsListener mListener;
 
+    private Set<Integer> mLoadedProcessedFriends = new HashSet<>();
+
     public interface EventsListener {
         void OnUpdateEventsCount(int count);
 
         void OnUpdateFEProcessedCount(int count);
         void OnUpdateFEProcessedFriendsCount(int count);
+
+        void OnPreviousProcessedFriendsLoaded(int count);
     }
 
     public VkEventsManager(EventsListener listener) {
         mListener = listener;
+    }
+
+    public void loadProcessedFriends() {
+        mLoadedProcessedFriends = MyUtils.loadProcessedFriends();
+        if(mListener != null)
+            mListener.OnPreviousProcessedFriendsLoaded(mLoadedProcessedFriends.size());
     }
 
     public void setMeetingsPackCount(int count) {
@@ -81,18 +89,20 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
             mListener.OnUpdateFEProcessedFriendsCount(0);
         }
         for (String id : friendsIds) {
-            try {
-                MyUtils.sleepT();
-            } catch (InterruptedException e) {
-                System.out.println("Stop collecting events. Total events: " + mEvents.size());
-                return;
+            if(!mLoadedProcessedFriends.contains(id)) {
+                try {
+                    MyUtils.sleepT();
+                } catch (InterruptedException e) {
+                    System.out.println("Stop collecting events. Total events: " + mEvents.size());
+                    return;
+                }
+                getEvent(id);
             }
-            getEvent(id);
-//            if(mFriendsProcessedCounter > maxFriends)
+//            if(mFriendsAnalysedCounter > maxFriends)
 //                break;
-            mFriendsProcessedCounter++;
+            mFriendsAnalysedCounter++;
             Integer oldPercent = percent;
-            percent = 100 * mFriendsProcessedCounter / mFriendsCount;
+            percent = 100 * mFriendsAnalysedCounter / mFriendsCount;
             if (percent % STEP_PERCENT == 0 && percent != oldPercent) {
                 System.out.println(percent + "% processed");
             }
@@ -100,9 +110,9 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
                 if (mListener != null)
                     mListener.OnUpdateFEProcessedCount(percent);
             }
-            if (mFriendsProcessedCounter % 10 == 0) {
+            if (mFriendsAnalysedCounter % 10 == 0) {
                 if (mListener != null)
-                    mListener.OnUpdateFEProcessedFriendsCount(mFriendsProcessedCounter);
+                    mListener.OnUpdateFEProcessedFriendsCount(mFriendsAnalysedCounter);
             }
         }
         sendMeetings();
@@ -228,15 +238,17 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
             mListener.OnUpdateEventsCount(mEvents.size());
 
         if (counter > 0) {
-            System.out.println("parseEvents() for " + userId + " : collected " + counter + " future events. Total Events: " +
-                    mEvents.size() + ". Duplicates: " + mCounterAgain + ". PermissionDenied: " + mPermissionDeniedCounter +
-                    ". Banned/Deleted: " + mUserUnavailable + ". Empty groupes: " + mEmptyGroupsAnswer +
-                    ". Friends processed: " + mFriendsProcessedCounter + " / " + mFriendsCount +
-                    " (" + mFriendsProcessedCounter / mFriendsCount + ")");
-//        System.out.println("-------------------------------------------------------------");
+            logInfo(userId, counter);
         }
+    }
 
-        mFriendsProcessed.add(Integer.valueOf(userId));
+    private void logInfo(final String userId, int counter) {
+        System.out.println("parseEvents() for " + userId + " : collected " + counter + " future events. Total Events: " +
+                mEvents.size() + ". Duplicates: " + mCounterAgain + ". PermissionDenied: " + mPermissionDeniedCounter +
+                ". Banned/Deleted: " + mUserUnavailable + ". Empty groupes: " + mEmptyGroupsAnswer +
+                ". Friends processed: " + mFriendsProcessed.size() +
+                ". Friends analysed: " + mFriendsAnalysedCounter + " / " + mFriendsCount +
+                " (" + mFriendsAnalysedCounter / mFriendsCount + ")");
     }
 
     public void sendMeetings() {
@@ -274,6 +286,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
 
     @Override
     public void OnGroupsResponse(String response, final String arg1) {
+        mFriendsProcessed.add(Integer.valueOf(arg1));
         parseEventsResponse(response, arg1);
     }
 
@@ -451,7 +464,13 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
     public void stopGettingEvents() {
         if (mCollectEventsThread != null)
             mCollectEventsThread.interrupt();
-        mFriendsProcessedCounter = 0;
+        mFriendsAnalysedCounter = 0;
+
+        // добавляем к тем, что реально обработали запросами к вк в этот рах
+        // тех френдов, которые были загружены ранее из файла (и не обрабатывались)
+        // и скидываем всех их в файл
+        mFriendsProcessed.addAll(mLoadedProcessedFriends);
+
         MyUtils.saveProcessedFriends(mFriendsProcessed);
     }
 }

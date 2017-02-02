@@ -178,7 +178,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     }
 
     public void saveFriendsCities() {
-        MyUtils.saveCities(mCities);
+        MyUtils.saveCitiesOrdered(mCities);
     }
 
 

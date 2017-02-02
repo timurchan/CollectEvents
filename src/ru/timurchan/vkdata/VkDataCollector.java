@@ -3,6 +3,7 @@ package ru.timurchan.vkdata;
 
 import org.json.*;
 import ru.timurchan.GetEvents;
+import ru.timurchan.utils.MyUtils;
 
 
 /*
@@ -82,6 +83,10 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
         mEventsManager.collectEvents(mFriendsManager.friendIds());
     }
 
+    public void loadProcessedFriends() {
+        mEventsManager.loadProcessedFriends();
+    }
+
     public void stopGettingFriends() {
         mFriendsManager.stopGettingFriends();
     }
@@ -123,5 +128,10 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
     @Override
     public void OnUpdateFEProcessedFriendsCount(int count) {
         window.setFEProcessedFriendsCount(count);
+    }
+
+    @Override
+    public void OnPreviousProcessedFriendsLoaded(int count) {
+        window.setPreviousProcessedFriendsCount(count);
     }
 }
