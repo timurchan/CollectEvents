@@ -38,6 +38,6 @@ public class VkUrlProvider {
     }
 
     public static String addToken(final String url) {
-        return url + "&access_token=930dd0dd171eb219ba55834382d4a76aace9fc77f7549e6b5ee79b634dfa2f15a14c3bfaf81dac3b6ddc0";
+        return url + "&access_token=6996008948abf8a78a514e2c11827927dd76f82005823c44a75c4f1b47561ddade3eeb7d32290e5fa595b"; // tester's account
     }
 }

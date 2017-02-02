@@ -45,7 +45,7 @@ public class MyUtils {
                 res.put(friend.id, friend);
             }
             return res;
-        } catch (Exception e) { 
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
