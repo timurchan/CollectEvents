@@ -50,6 +50,13 @@ public class GetEvents {
         buttonGetFriends.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String str = tfInitialFriendId.getText();
+                try {
+                    Integer tmp = Integer.valueOf(str); // initial friend id have to be a number
+                    vkDataCollector.setInitilFriendId(str);
+                } catch (NumberFormatException e_number) {
+                    System.out.println("Wrong input value in tfMeetingsPackCount field. String is " + str);
+                }
                 vkDataCollector.collectFriends();
                 buttonGetFriends.setEnabled(false);
                 buttonStopGettngFriinds.setEnabled(true);
@@ -152,11 +159,6 @@ public class GetEvents {
         try {
             Integer packCount = Integer.valueOf(str);
             vkDataCollector.setMeetingsPackCount(packCount);
-
-            str = tfInitialFriendId.getText();
-            Integer tmp = Integer.valueOf(str); // initial friend id have to be a number
-
-            vkDataCollector.setInitilFriendId(str);
         } catch (NumberFormatException e) {
             System.out.println("Wrong input value in tfMeetingsPackCount field. String is " + str);
         }
