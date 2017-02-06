@@ -14,6 +14,7 @@ public class MyUtils {
     private static final int deltaTime = 370; // msec
 
     private static final String FRIENDS_PROCESSED_IDS_FNAME = "friends_processed_ids.txt";
+    private static final String EVENTS_PROCESSED_IDS_FNAME = "events_processed_ids.txt";
     private static final String FRIENDS_FNAME = "friends.txt";
     private static final String FRIENDS_IDS_FNAME = "friends_ids.txt";
     private static final String FRIENDS_CITIES_FNAME = "friends_cities.txt";
@@ -142,35 +143,61 @@ public class MyUtils {
         System.out.println(counter + " cities saved to " + FRIENDS_CITIES_ORDERED_FNAME + ". cities.size() = " + cities.size());
     }
 
-    static public Set<Integer> loadProcessedFriends() {
+    static public Set<Integer> loadProcessedIds(final String fname) {
         Set<Integer> res = new HashSet<>();
         Gson gson = new Gson();
 
         try {
-            Integer[] ids = gson.fromJson(new FileReader(FRIENDS_PROCESSED_IDS_FNAME), Integer[].class);
-            res = new HashSet<>(Arrays.asList(ids));
+            Integer[] ids = gson.fromJson(new FileReader(fname), Integer[].class);
+            if(ids == null) {
+                res = new HashSet<>();
+            } else {
+                res = new HashSet<>(Arrays.asList(ids));
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        System.out.println(res.size() + " friends ids loaded from " + FRIENDS_PROCESSED_IDS_FNAME);
+        System.out.println(res.size() + " ids loaded from " + fname);
         return res;
     }
 
+
+    static public Set<Integer> loadProcessedFriends() {
+        System.out.println("Loading processed friends ids");
+        return loadProcessedIds(FRIENDS_PROCESSED_IDS_FNAME);
+    }
+
+    static public Set<Integer> loadProcessedEventIds() {
+        System.out.println("Loading processed events ids");
+        return loadProcessedIds(EVENTS_PROCESSED_IDS_FNAME);
+    }
+
     // сохраняет id френдов, для которых уже были просмотрены события
-    static public void saveProcessedFriends(ArrayList<Integer> ids) {
+    static public void saveProcessedFriends(final Collection<Integer> ids) {
+        System.out.println("Saving processed friends ids");
+        saveProcessedIds(ids, FRIENDS_PROCESSED_IDS_FNAME);
+    }
+
+    // сохраняет id эвентов, для которые уже отправлялись на сервер
+    static public void saveProcessedEventIds(final Collection<Integer> ids) {
+        System.out.println("Saving processed events ids");
+        saveProcessedIds(ids, EVENTS_PROCESSED_IDS_FNAME);
+    }
+
+    static public void saveProcessedIds(final Collection<Integer> ids, final String fname) {
         Integer[] array = ids.toArray(new Integer[ids.size()]);
 
         Gson gson = new Gson();
         try {
-            PrintWriter out = new PrintWriter(FRIENDS_PROCESSED_IDS_FNAME);
+            PrintWriter out = new PrintWriter(fname);
             String resultJson = gson.toJson(array);
             out.println(resultJson);
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(ids.size() + " friends ids saved to " + FRIENDS_PROCESSED_IDS_FNAME);
+        System.out.println(ids.size() + " ids saved to " + fname);
     }
 
     static class FastReader {

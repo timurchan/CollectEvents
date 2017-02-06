@@ -42,7 +42,7 @@ public class GetEvents {
         frame.pack();
         frame.setVisible(true);
         addWindowListener(frame);
-        frame.setSize(650, 300);
+        frame.setSize(750, 300);
         vkDataCollector.setWindow(getEventInstance);
     }
 
@@ -149,8 +149,10 @@ public class GetEvents {
         labelFEProcessedCount.setText(String.valueOf(count));
     }
 
-    public void setPreviousProcessedFriendsCount(int count) {
-        labelPreviousProcessedFriends.setText(String.valueOf(count));
+    public void setPreviousProcessedFriendsCount(int countFriends, int countEvents) {
+        String text = String.valueOf(countFriends) + " friends & " +
+                String.valueOf(countEvents) + " events";
+        labelPreviousProcessedFriends.setText(text);
     }
 
     public void setEventsCount(int count) {

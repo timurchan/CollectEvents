@@ -131,7 +131,7 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
     }
 
     @Override
-    public void OnPreviousProcessedFriendsLoaded(int count) {
-        window.setPreviousProcessedFriendsCount(count);
+    public void OnPreviousProcessedFriendsLoaded(int countFriends, int countEvents) {
+        window.setPreviousProcessedFriendsCount(countFriends, countEvents);
     }
 }

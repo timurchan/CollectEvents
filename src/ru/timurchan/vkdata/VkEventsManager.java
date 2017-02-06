@@ -23,7 +23,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
     static public final boolean VK_VERSION_USING = false;
 
     private int MEETINGS_COUNT_TO_SEND = 5;
-    private int STEP_PERCENT = 5;
+    final private int STEP_PERCENT = 5;
 
     private int mPermissionDeniedCounter = 0;
     private int mCounterAgain = 0;
@@ -34,7 +34,10 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
     private int mQueueCounter = 1;
 
     private int mFriendsCount = 0;
-    private Map<String, Event> mEvents = new TreeMap<>();
+
+    private Map<Integer, Event> mEvents = new TreeMap<>();
+    private Set<Integer> mEventIds = new TreeSet<>();
+
     private ArrayList<Meeting> mMeetings = new ArrayList<>();
 
     private Thread mCollectEventsThread;
@@ -43,7 +46,8 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
 
     private EventsListener mListener;
 
-    private Set<Integer> mLoadedProcessedFriends = new HashSet<>();
+    private Set<Integer> mLoadedProcessedFriends = new TreeSet<>();
+    private Set<Integer> mLoadedProcessedEventIds = new TreeSet<>();
 
     public interface EventsListener {
         void OnUpdateEventsCount(int count);
@@ -51,7 +55,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
         void OnUpdateFEProcessedCount(int count);
         void OnUpdateFEProcessedFriendsCount(int count);
 
-        void OnPreviousProcessedFriendsLoaded(int count);
+        void OnPreviousProcessedFriendsLoaded(int countFrinds, int countEvents);
     }
 
     public VkEventsManager(EventsListener listener) {
@@ -60,8 +64,9 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
 
     public void loadProcessedFriends() {
         mLoadedProcessedFriends = MyUtils.loadProcessedFriends();
+        mLoadedProcessedEventIds = MyUtils.loadProcessedEventIds();
         if(mListener != null)
-            mListener.OnPreviousProcessedFriendsLoaded(mLoadedProcessedFriends.size());
+            mListener.OnPreviousProcessedFriendsLoaded(mLoadedProcessedFriends.size(), mLoadedProcessedEventIds.size());
     }
 
     public void setMeetingsPackCount(int count) {
@@ -81,7 +86,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
     public void collectEventsInternal(final Collection<String> friendsIds) {
         System.out.println("Total friends: " + friendsIds.size());
         mFriendsCount = friendsIds.size();
-        mEvents.clear();
+        mEventIds.clear();
         int maxFriends = 1;
         Integer percent = 0;
         if (mListener != null) {
@@ -89,11 +94,11 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
             mListener.OnUpdateFEProcessedFriendsCount(0);
         }
         for (String id : friendsIds) {
-            if(!mLoadedProcessedFriends.contains(id)) {
+            if(!mLoadedProcessedFriends.contains(Integer.valueOf(id))) {
                 try {
                     MyUtils.sleepT();
                 } catch (InterruptedException e) {
-                    System.out.println("Stop collecting events. Total events: " + mEvents.size());
+                    System.out.println("Stop collecting events. Total events: " + mEventIds.size());
                     return;
                 }
                 getEvent(id);
@@ -215,36 +220,44 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
                         //e.printStackTrace();
                     }
                     if (curStartTime > unixTime) {
+                        processFutureEvent(event);
                         counter++;
-                        String eventId = Integer.toString(event.id);
-                        if (!mEvents.containsKey(eventId)) {
-                            System.out.println(" - FE - " + event.name);
-                            mEvents.put(eventId, event);
-                            mMeetings.add(ImportMeetingCreator.createMeeting(event, mQueueCounter));
-                        } else {
-                            mCounterAgain++;
-                        }
-
-                        if (mMeetings.size() >= MEETINGS_COUNT_TO_SEND) {
-                            sendMeetings();
-                            mQueueCounter++;
-                        }
                     }
                 }
             }
         }
 
         if (mListener != null)
-            mListener.OnUpdateEventsCount(mEvents.size());
+            mListener.OnUpdateEventsCount(mEventIds.size());
 
         if (counter > 0) {
             logInfo(userId, counter);
         }
     }
 
+    private void processFutureEvent(final Event event) {
+        Integer eventId = event.id;
+        boolean in_current = mEventIds.contains(eventId);
+        boolean in_loaded = mLoadedProcessedEventIds.contains(eventId);
+        if (!in_current && !in_loaded) {
+            System.out.println(" - FE - " + event.name);
+            mEvents.put(eventId, event);
+            // eventId must be integer. If crash, than see API
+            mEventIds.add(eventId);
+            mMeetings.add(ImportMeetingCreator.createMeeting(event, mQueueCounter));
+        } else {
+            mCounterAgain++;
+        }
+
+        if (mMeetings.size() >= MEETINGS_COUNT_TO_SEND) {
+            sendMeetings();
+            mQueueCounter++;
+        }
+    }
+
     private void logInfo(final String userId, int counter) {
         System.out.println("parseEvents() for " + userId + " : collected " + counter + " future events. Total Events: " +
-                mEvents.size() + ". Duplicates: " + mCounterAgain + ". PermissionDenied: " + mPermissionDeniedCounter +
+                mEventIds.size() + ". Duplicates: " + mCounterAgain + ". PermissionDenied: " + mPermissionDeniedCounter +
                 ". Banned/Deleted: " + mUserUnavailable + ". Empty groupes: " + mEmptyGroupsAnswer +
                 ". Friends processed: " + mFriendsProcessed.size() +
                 ". Friends analysed: " + mFriendsAnalysedCounter + " / " + mFriendsCount +
@@ -469,8 +482,20 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
         // добавляем к тем, что реально обработали запросами к вк в этот рах
         // тех френдов, которые были загружены ранее из файла (и не обрабатывались)
         // и скидываем всех их в файл
-        mFriendsProcessed.addAll(mLoadedProcessedFriends);
+        //mFriendsProcessed.addAll(mLoadedProcessedFriends);
 
-        MyUtils.saveProcessedFriends(mFriendsProcessed);
+        String str = "mLoadedProcessedFriends.size() = { was " + mLoadedProcessedFriends.size();
+        mLoadedProcessedFriends.addAll(mFriendsProcessed);
+        str += " | become " + mLoadedProcessedFriends.size() + "}";
+        System.out.println(str);
+        MyUtils.saveProcessedFriends(mLoadedProcessedFriends);
+
+        // аналогично с уже отправленным событиями
+        str = "mLoadedProcessedEventIds.size() = { was " + mLoadedProcessedEventIds.size();
+        mLoadedProcessedEventIds.addAll(mEventIds);
+        str += " | become " + mLoadedProcessedEventIds.size() + "}";
+        System.out.println(str);
+        MyUtils.saveProcessedEventIds(mLoadedProcessedEventIds);
+        mEventIds.clear();
     }
 }
