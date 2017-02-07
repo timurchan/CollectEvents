@@ -5,6 +5,7 @@ import ru.timurchan.model.Friend;
 import ru.timurchan.vkdata.City;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -20,6 +21,11 @@ public class MyUtils {
     private static final String FRIENDS_CITIES_FNAME = "friends_cities.txt";
     private static final String FRIENDS_CITIES_ORDERED_FNAME = "friends_cities_ordered.txt";
 
+
+    static public String getCurrentTimeStamp() {
+        //return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(Calendar.getInstance().getTime());
+    }
 
     static public void sleep() {
         try {

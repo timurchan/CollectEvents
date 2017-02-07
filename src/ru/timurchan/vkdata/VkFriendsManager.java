@@ -165,7 +165,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
                 Integer oldPercent = percent;
                 percent = 100 * counter / friends.size();
                 if (percent % STEP_PERCENT == 0 && percent != oldPercent) {
-                    System.out.println(percent + "% processed");
+                    System.out.println(percent + "% processed. Time is " + MyUtils.getCurrentTimeStamp());
                 }
             }
         } catch (InterruptedException e) {

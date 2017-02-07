@@ -109,7 +109,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
             Integer oldPercent = percent;
             percent = 100 * mFriendsAnalysedCounter / mFriendsCount;
             if (percent % STEP_PERCENT == 0 && percent != oldPercent) {
-                System.out.println(percent + "% processed");
+                System.out.println(percent + "% processed. Time is " + MyUtils.getCurrentTimeStamp());
             }
             if (percent % 1 == 0 && percent != oldPercent) {
                 if (mListener != null)
