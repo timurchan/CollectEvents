@@ -1,0 +1,3 @@
+*.txt
+out/
+.idea/workspace.xml

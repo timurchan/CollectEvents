@@ -8,7 +8,7 @@ import java.util.Set;
  * Created by tiga1115 on 30.01.2017.
  */
 public class FeUrlProvider {
-    static final String mDomain = "http://friendevent.org/api/";
+    static final String mDomain = "https://invite.plus/api/";
 
     static public String saveSocialEvents() {
         String url = mDomain + "meetings/saveSocialEvents";
