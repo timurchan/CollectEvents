@@ -49,7 +49,7 @@ public class ImportMeetingCreator {
 
         m.header = event.name;
         //m.tag = "tim.1." + queueNumber + ".";
-        m.tag = "tim.";
+        m.tag = "after_21_03_2017";
         m.message = event.description;
 
         m.startUxTime = event.start_date;
