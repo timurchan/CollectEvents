@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -73,7 +74,8 @@ public class MyHttpURLConnection {
             //System.out.println("Response Code : " + responseCode);
 
             BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+
             String inputLine;
             StringBuffer response = new StringBuffer();
 
