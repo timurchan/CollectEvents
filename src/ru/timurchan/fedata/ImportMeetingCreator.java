@@ -9,6 +9,8 @@ import java.util.ArrayList;
  */
 
 public class ImportMeetingCreator {
+    final static private String MEETING_TAG = "after_30_03_2017";
+
     private Event mEvent;
 
     public ImportMeetingCreator() {}
@@ -49,7 +51,7 @@ public class ImportMeetingCreator {
 
         m.header = event.name;
         //m.tag = "tim.1." + queueNumber + ".";
-        m.tag = "after_21_03_2017";
+        m.tag = MEETING_TAG;
         m.message = event.description;
 
         m.startUxTime = event.start_date;

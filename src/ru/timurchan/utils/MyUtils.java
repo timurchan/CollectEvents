@@ -182,13 +182,23 @@ public class MyUtils {
     // сохраняет id френдов, для которых уже были просмотрены события
     static public void saveProcessedFriends(final Collection<Integer> ids) {
         System.out.println("Saving processed friends ids");
-        saveProcessedIds(ids, FRIENDS_PROCESSED_IDS_FNAME);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                saveProcessedIds(ids, FRIENDS_PROCESSED_IDS_FNAME);
+            }
+        }).start();
     }
 
     // сохраняет id эвентов, для которые уже отправлялись на сервер
     static public void saveProcessedEventIds(final Collection<Integer> ids) {
         System.out.println("Saving processed events ids");
-        saveProcessedIds(ids, EVENTS_PROCESSED_IDS_FNAME);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                saveProcessedIds(ids, EVENTS_PROCESSED_IDS_FNAME);
+            }
+        }).start();
     }
 
     static public void saveProcessedIds(final Collection<Integer> ids, final String fname) {

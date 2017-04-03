@@ -102,6 +102,11 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
                     return;
                 }
                 getEvent(id);
+                if (mFriendsAnalysedCounter % 1000 == 0 ||
+                        mFriendsAnalysedCounter == friendsIds.size()) {
+                    saveProcessedEvents();
+                    saveProcessedFriends();
+                }
             }
 //            if(mFriendsAnalysedCounter > maxFriends)
 //                break;
@@ -115,7 +120,8 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
                 if (mListener != null)
                     mListener.OnUpdateFEProcessedCount(percent);
             }
-            if (mFriendsAnalysedCounter % 10 == 0) {
+            if (mFriendsAnalysedCounter % 10 == 0 ||
+                    mFriendsAnalysedCounter == friendsIds.size()) {
                 if (mListener != null)
                     mListener.OnUpdateFEProcessedFriendsCount(mFriendsAnalysedCounter);
             }
@@ -479,19 +485,23 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
             mCollectEventsThread.interrupt();
         mFriendsAnalysedCounter = 0;
 
-        // добавляем к тем, что реально обработали запросами к вк в этот рах
-        // тех френдов, которые были загружены ранее из файла (и не обрабатывались)
-        // и скидываем всех их в файл
-        //mFriendsProcessed.addAll(mLoadedProcessedFriends);
 
+        saveProcessedFriends();
+        saveProcessedEvents();
+    }
+
+    private void saveProcessedFriends() {
+        // добавляем к ранее загруженным френдам оработанные за сеанс друзья
         String str = "mLoadedProcessedFriends.size() = { was " + mLoadedProcessedFriends.size();
         mLoadedProcessedFriends.addAll(mFriendsProcessed);
         str += " | become " + mLoadedProcessedFriends.size() + "}";
         System.out.println(str);
         MyUtils.saveProcessedFriends(mLoadedProcessedFriends);
+    }
 
+    private void saveProcessedEvents() {
         // аналогично с уже отправленным событиями
-        str = "mLoadedProcessedEventIds.size() = { was " + mLoadedProcessedEventIds.size();
+        String str = "mLoadedProcessedEventIds.size() = { was " + mLoadedProcessedEventIds.size();
         mLoadedProcessedEventIds.addAll(mEventIds);
         str += " | become " + mLoadedProcessedEventIds.size() + "}";
         System.out.println(str);
