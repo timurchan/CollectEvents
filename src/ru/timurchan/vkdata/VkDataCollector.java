@@ -25,7 +25,7 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
 
     static private int mPermissionDeniedCounter = 0;
 
-    VkFriendsManager mFriendsManager = new VkFriendsManager(this, this);
+    VkFriendsManager mFriendsManager = new VkFriendsManager(this, this, this);
     VkEventsManager mEventsManager = new VkEventsManager(this);
 
     GetEvents window;
@@ -132,5 +132,9 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
     @Override
     public void OnPreviousProcessedFriendsLoaded(int countFriends, int countEvents) {
         window.setPreviousProcessedFriendsCount(countFriends, countEvents);
+    }
+
+    public boolean isFriendsLevel2() {
+        return window.isFriendsLevel2();
     }
 }

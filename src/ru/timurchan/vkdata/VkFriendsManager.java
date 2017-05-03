@@ -22,6 +22,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     private Thread mGollectFriendsThread;
     private FriendsListener mListener;
     private VkEventsManager.EventsListener mShowFriendsListener;
+    private VkDataCollector mDataCollector;
 
     private String initialUserrId = "69822";
 
@@ -30,9 +31,11 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     }
 
     public VkFriendsManager(FriendsListener friendsListener,
-                            VkEventsManager.EventsListener showFriendsListener) {
+                            VkEventsManager.EventsListener showFriendsListener,
+                            VkDataCollector dataCollector) {
         mListener = friendsListener;
         mShowFriendsListener = showFriendsListener;
+        mDataCollector = dataCollector;
     }
 
     public void setInitilFriendId(final String initialId) {
@@ -214,7 +217,7 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     public void OnFriendsResponse(String response, final String arg1) {
         parseFriendsResponse(response);
         mFriendsRequestsCounter++;
-        if (arg1.equals(initialUserrId)) {
+        if (mDataCollector.isFriendsLevel2() && arg1.equals(initialUserrId)) {
             mGollectFriendsThread = new Thread(new Runnable() {
                 @Override
                 public void run() {

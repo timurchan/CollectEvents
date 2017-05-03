@@ -30,6 +30,8 @@ public class GetEvents {
     private JLabel labelFEProcessedCount;
     private JButton buttonLoadProcessedFriends;
     private JLabel labelPreviousProcessedFriends;
+    private JRadioButton radioFriendsLevel2;
+    private JRadioButton radioFriendsLevel1;
 
     static private VkDataCollector vkDataCollector = new VkDataCollector();
 
@@ -135,6 +137,11 @@ public class GetEvents {
                 vkDataCollector.loadProcessedFriends();
             }
         });
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(radioFriendsLevel1);
+        group.add(radioFriendsLevel2);
+        setFriendsLevel2();
     }
 
     public void setFriendsCount(int count) {
@@ -143,6 +150,15 @@ public class GetEvents {
 
     public void setFEProcessedFriendsPercent(int count) {
         labelFEProcessed.setText(String.valueOf(count));
+    }
+
+    public void setFriendsLevel2() {
+        radioFriendsLevel2.setSelected(true);
+        radioFriendsLevel1.setSelected(false);
+    }
+
+    public boolean isFriendsLevel2() {
+        return radioFriendsLevel2.isSelected();
     }
 
     public void setFEProcessedFriendsCount(int count) {
