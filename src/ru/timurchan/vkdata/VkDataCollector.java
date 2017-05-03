@@ -3,7 +3,6 @@ package ru.timurchan.vkdata;
 
 import org.json.*;
 import ru.timurchan.GetEvents;
-import ru.timurchan.utils.MyUtils;
 
 
 /*
@@ -26,7 +25,7 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
 
     static private int mPermissionDeniedCounter = 0;
 
-    VkFriendsManager mFriendsManager = new VkFriendsManager(this);
+    VkFriendsManager mFriendsManager = new VkFriendsManager(this, this);
     VkEventsManager mEventsManager = new VkEventsManager(this);
 
     GetEvents window;
@@ -121,8 +120,8 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
     }
 
     @Override
-    public void OnUpdateFEProcessedCount(int count) {
-        window.setFEProcessedCount(count);
+    public void OnUpdateFEProcessedFriendsPercent(int count) {
+        window.setFEProcessedFriendsPercent(count);
     }
 
     @Override

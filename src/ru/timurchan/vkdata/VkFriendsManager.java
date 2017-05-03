@@ -17,10 +17,11 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
     private Map<String, Friend> mFriends = new TreeMap<>();
     private Map<Integer, City> mCities = new TreeMap<>();
 
-    private int STEP_PERCENT = 5;
+    private int STEP_PERCENT = 1;
     private int mFriendsRequestsCounter = 0;
     private Thread mGollectFriendsThread;
     private FriendsListener mListener;
+    private VkEventsManager.EventsListener mShowFriendsListener;
 
     private String initialUserrId = "69822";
 
@@ -28,8 +29,10 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
         void OnUpdateFriendsCount(int count);
     }
 
-    public VkFriendsManager(FriendsListener listener) {
-        mListener = listener;
+    public VkFriendsManager(FriendsListener friendsListener,
+                            VkEventsManager.EventsListener showFriendsListener) {
+        mListener = friendsListener;
+        mShowFriendsListener = showFriendsListener;
     }
 
     public void setInitilFriendId(final String initialId) {
@@ -87,8 +90,12 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
                 }
             }
         }
-        if (mListener != null)
+        if (mListener != null) {
             mListener.OnUpdateFriendsCount(mFriends.size());
+        }
+        if (mShowFriendsListener != null) {
+            mShowFriendsListener.OnUpdateFEProcessedFriendsCount(mFriends.size());
+        }
     }
 
     private Friend parseOneFriend(final JSONObject obj) throws JSONException {
@@ -165,7 +172,10 @@ public class VkFriendsManager implements MyHttpURLConnection.ConnectionListener 
                 Integer oldPercent = percent;
                 percent = 100 * counter / friends.size();
                 if (percent % STEP_PERCENT == 0 && percent != oldPercent) {
-                    System.out.println(percent + "% processed. Time is " + MyUtils.getCurrentTimeStamp());
+                    //System.out.println(percent + "% processed. Time is " + MyUtils.getCurrentTimeStamp());
+                    if(mShowFriendsListener != null) {
+                        mShowFriendsListener.OnUpdateFEProcessedFriendsPercent(percent);
+                    }
                 }
             }
         } catch (InterruptedException e) {

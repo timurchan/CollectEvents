@@ -141,7 +141,7 @@ public class GetEvents {
         labelFriendCount.setText(String.valueOf(count));
     }
 
-    public void setFEProcessedCount(int count) {
+    public void setFEProcessedFriendsPercent(int count) {
         labelFEProcessed.setText(String.valueOf(count));
     }
 

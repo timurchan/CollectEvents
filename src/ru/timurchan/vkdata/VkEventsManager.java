@@ -52,7 +52,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
     public interface EventsListener {
         void OnUpdateEventsCount(int count);
 
-        void OnUpdateFEProcessedCount(int count);
+        void OnUpdateFEProcessedFriendsPercent(int count);
         void OnUpdateFEProcessedFriendsCount(int count);
 
         void OnPreviousProcessedFriendsLoaded(int countFrinds, int countEvents);
@@ -90,7 +90,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
         int maxFriends = 1;
         Integer percent = 0;
         if (mListener != null) {
-            mListener.OnUpdateFEProcessedCount(0);
+            mListener.OnUpdateFEProcessedFriendsPercent(0);
             mListener.OnUpdateFEProcessedFriendsCount(0);
         }
         for (String id : friendsIds) {
@@ -102,23 +102,24 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
                     return;
                 }
                 getEvent(id);
-                if (mFriendsAnalysedCounter % 1000 == 0 ||
+                if (mFriendsAnalysedCounter % 500 == 0 ||
                         mFriendsAnalysedCounter == friendsIds.size()) {
-                    saveProcessedEvents();
+                    saveProcessedEvents(false);
                     saveProcessedFriends();
                 }
             }
 //            if(mFriendsAnalysedCounter > maxFriends)
 //                break;
             mFriendsAnalysedCounter++;
+
             Integer oldPercent = percent;
             percent = 100 * mFriendsAnalysedCounter / mFriendsCount;
-            if (percent % STEP_PERCENT == 0 && percent != oldPercent) {
+            if (percent % STEP_PERCENT == 0 && !percent.equals(oldPercent)) {
                 System.out.println(percent + "% processed. Time is " + MyUtils.getCurrentTimeStamp());
             }
-            if (percent % 1 == 0 && percent != oldPercent) {
+            if (percent % 1 == 0 && !percent.equals(oldPercent)) {
                 if (mListener != null)
-                    mListener.OnUpdateFEProcessedCount(percent);
+                    mListener.OnUpdateFEProcessedFriendsPercent(percent);
             }
             if (mFriendsAnalysedCounter % 10 == 0 ||
                     mFriendsAnalysedCounter == friendsIds.size()) {
@@ -487,7 +488,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
 
 
         saveProcessedFriends();
-        saveProcessedEvents();
+        saveProcessedEvents(true);
     }
 
     private void saveProcessedFriends() {
@@ -499,13 +500,14 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
         MyUtils.saveProcessedFriends(mLoadedProcessedFriends);
     }
 
-    private void saveProcessedEvents() {
+    private void saveProcessedEvents(boolean clearEvents) {
         // аналогично с уже отправленным событиями
         String str = "mLoadedProcessedEventIds.size() = { was " + mLoadedProcessedEventIds.size();
         mLoadedProcessedEventIds.addAll(mEventIds);
         str += " | become " + mLoadedProcessedEventIds.size() + "}";
         System.out.println(str);
         MyUtils.saveProcessedEventIds(mLoadedProcessedEventIds);
-        mEventIds.clear();
+        if(clearEvents)
+            mEventIds.clear();
     }
 }
