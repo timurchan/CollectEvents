@@ -26,7 +26,7 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
     static private int mPermissionDeniedCounter = 0;
 
     VkFriendsManager mFriendsManager = new VkFriendsManager(this, this, this);
-    VkEventsManager mEventsManager = new VkEventsManager(this);
+    VkEventsManager mEventsManager = new VkEventsManager(this, this);
 
     GetEvents window;
 
@@ -136,5 +136,9 @@ public class VkDataCollector implements VkFriendsManager.FriendsListener, VkEven
 
     public boolean isFriendsLevel2() {
         return window.isFriendsLevel2();
+    }
+
+    public String getMeetingTag() {
+        return window.getMeetingTag();
     }
 }

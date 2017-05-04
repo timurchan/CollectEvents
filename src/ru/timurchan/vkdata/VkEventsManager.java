@@ -45,6 +45,8 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
     private FeDataManager feDataManager = new FeDataManager();
 
     private EventsListener mListener;
+    private VkDataCollector mDataCollector;
+    private ImportMeetingCreator meetingCreator = new ImportMeetingCreator();
 
     private Set<Integer> mLoadedProcessedFriends = new TreeSet<>();
     private Set<Integer> mLoadedProcessedEventIds = new TreeSet<>();
@@ -58,8 +60,10 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
         void OnPreviousProcessedFriendsLoaded(int countFrinds, int countEvents);
     }
 
-    public VkEventsManager(EventsListener listener) {
+    public VkEventsManager(EventsListener listener,
+                           VkDataCollector dataCollector) {
         mListener = listener;
+        mDataCollector = dataCollector;
     }
 
     public void loadProcessedFriends() {
@@ -251,7 +255,7 @@ public class VkEventsManager implements MyHttpURLConnection.ConnectionListener {
             mEvents.put(eventId, event);
             // eventId must be integer. If crash, than see API
             mEventIds.add(eventId);
-            mMeetings.add(ImportMeetingCreator.createMeeting(event, mQueueCounter));
+            mMeetings.add(meetingCreator.createMeeting(event, mDataCollector.getMeetingTag()));
         } else {
             mCounterAgain++;
         }

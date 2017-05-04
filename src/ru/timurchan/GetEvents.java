@@ -32,6 +32,7 @@ public class GetEvents {
     private JLabel labelPreviousProcessedFriends;
     private JRadioButton radioFriendsLevel2;
     private JRadioButton radioFriendsLevel1;
+    private JTextField meetingTag;
 
     static private VkDataCollector vkDataCollector = new VkDataCollector();
 
@@ -161,6 +162,10 @@ public class GetEvents {
         return radioFriendsLevel2.isSelected();
     }
 
+    public String getMeetingTag() {
+        return meetingTag.getText();
+    }
+
     public void setFEProcessedFriendsCount(int count) {
         labelFEProcessedCount.setText(String.valueOf(count));
     }
@@ -218,5 +223,4 @@ public class GetEvents {
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
-
 }

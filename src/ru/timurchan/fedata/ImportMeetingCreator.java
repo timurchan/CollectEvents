@@ -2,20 +2,25 @@ package ru.timurchan.fedata;
 
 import ru.timurchan.model.Event;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Timur on 14.01.2017.
  */
 
 public class ImportMeetingCreator {
-    final static private String MEETING_TAG = "after_30_03_2017";
+    private String MEETING_TAG = "may_2017";
 
-    private Event mEvent;
+    private Date mDate;
+    private String mDateString;
 
-    public ImportMeetingCreator() {}
-    public ImportMeetingCreator(final Event event) {
-        mEvent = event;
+    public ImportMeetingCreator() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        mDate = new Date();
+        mDateString = dateFormat.format(mDate);
     }
 
     /**
@@ -45,13 +50,17 @@ public class ImportMeetingCreator {
 
 
 
-    public static SocialMeeting createMeeting(final Event event, int queueNumber) {
+    public SocialMeeting createMeeting(final Event event, final String tag) {
         SocialMeeting.SocialType type = SocialMeeting.SocialType.VK;
         SocialMeeting m = new SocialMeeting(type);
 
+        if(tag == null || tag.isEmpty()) {
+            m.tag = mDateString;
+        } else {
+            m.tag = tag;
+        }
+
         m.header = event.name;
-        //m.tag = "tim.1." + queueNumber + ".";
-        m.tag = MEETING_TAG;
         m.message = event.description;
 
         m.startUxTime = event.start_date;
