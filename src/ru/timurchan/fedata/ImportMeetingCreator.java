@@ -98,6 +98,8 @@ public class ImportMeetingCreator {
         m.canPost = event.canPost;
         m.socialEventId = event.id;
 
+        m.contacts = event.contacts;
+
         System.out.println(m.socialEventId + ", " +
                 m.startUxTime + ", " +
                 m.finishUxTime + ", " +

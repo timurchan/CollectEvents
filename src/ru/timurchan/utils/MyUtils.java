@@ -185,6 +185,7 @@ public class MyUtils {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                
                 saveProcessedIds(ids, FRIENDS_PROCESSED_IDS_FNAME);
             }
         }).start();
@@ -245,5 +246,17 @@ public class MyUtils {
             }
             return "";
         }
+    }
+
+    public static Double string2Double(final String value) {
+        Double res = 0.0;
+        try {
+            res = Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 }

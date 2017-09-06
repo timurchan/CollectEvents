@@ -6,9 +6,11 @@ import org.json.JSONObject;
 import ru.timurchan.model.Friend;
 import ru.timurchan.utils.MyHttpURLConnection;
 import ru.timurchan.utils.MyUtils;
-import ru.timurchan.utils.VkUrlProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Timur on 30.01.2017.

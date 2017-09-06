@@ -27,4 +27,6 @@ public class SocialMeeting extends Meeting {
         super();
         this.socialType = socialType;
     }
+
+    public ArrayList<Contact> contacts;
 }

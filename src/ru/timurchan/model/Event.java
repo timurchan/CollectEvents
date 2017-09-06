@@ -1,5 +1,9 @@
 package ru.timurchan.model;
 
+import ru.timurchan.fedata.Contact;
+
+import java.util.ArrayList;
+
 /**
  * Created by Timur on 30.01.2017.
  */
@@ -30,6 +34,7 @@ public class Event {
 
     public Event() {}
 
+    public ArrayList<Contact> contacts;
 
     @Override
     public String toString() {
